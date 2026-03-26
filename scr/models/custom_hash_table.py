@@ -2,9 +2,11 @@ class CustomHashTable:
     def __init__(self, capacity=1024):
         self.capacity = capacity
         self.size = 0
-        self.table = [None] * self.capacity
+        self.keys = [None] * self.capacity
+        self.values = [None] * self.capacity
 
     def _hash(self, key):
+        # hash_val = hash(key)
         hash_val = 5381
         for char in str(key):
             hash_val = ((hash_val << 5) + hash_val) + ord(char)
@@ -13,13 +15,15 @@ class CustomHashTable:
     def increment(self, key):
         # Линейное пробирование для разрешения коллизий
         idx = self._hash(key)
-        while self.table[idx] is not None:
-            if self.table[idx] == key:
-                self.table[idx] = (key, self.table[idx] + 1)
+        while self.keys[idx] is not None:
+            if self.keys[idx] == key:
+                # print("collision")
+                self.values[idx] += 1
                 return
             idx = (idx + 1) % self.capacity
 
-        self.table[idx] = (key, 1)
+        self.keys[idx] = key
+        self.values[idx] = 1
         self.size += 1
 
         # Контроль коэффициента заполнения
@@ -28,23 +32,26 @@ class CustomHashTable:
 
     def get(self, key):
         idx = self._hash(key)
-        while self.table[idx] is not None:
-            if self.table[idx] == key:
-                return self.table[idx]
+        while self.keys[idx] is not None:
+            if self.keys[idx] == key:
+                return self.values[idx]
             idx = (idx + 1) % self.capacity
         return 0
 
     def _resize(self):
-        old_table = self.table
+        old_keys = self.keys
+        old_values = self.values
+
         self.capacity *= 2
-        self.table = [None] * self.capacity
+        self.keys = [None] * self.capacity
+        self.values = [None] * self.capacity
         self.size = 0
-        for item in old_table:
-            if item is not None:
+        for key, val in zip(old_keys, old_values):
+            if key is not None:
                 # Вставка элементов в новую таблицу
-                key, val = item
                 idx = self._hash(key)
-                while self.table[idx] is not None:
+                while self.keys[idx] is not None:
                     idx = (idx + 1) % self.capacity
-                self.table[idx] = (key, val)
+                self.keys[idx] = key
+                self.values[idx] = val
                 self.size += 1

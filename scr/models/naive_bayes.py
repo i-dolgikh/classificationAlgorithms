@@ -11,7 +11,7 @@ class NaiveBayesClassifier:
 
     def fit(self, X, y):
         self.total_samples = len(y)
-        num_features = len(X)
+        num_features = len(X[0])
 
         for i in range(num_features):
             self.vocab_sizes[i] = set()
@@ -24,7 +24,8 @@ class NaiveBayesClassifier:
             for j in range(num_features):
                 val = X[i][j]
                 self.vocab_sizes[j].add(val)
-                key = f"feat_{j}_val_{val}_class_{cls}"
+                # key = f"feat_{j}_val_{val}_class_{cls}"
+                key = (j, val, cls)
                 self.feature_counts.increment(key)
 
         # Перевод множеств в размеры для O(1) доступа
@@ -44,7 +45,8 @@ class NaiveBayesClassifier:
 
             for j in range(len(x)):
                 val = x[j]
-                key = f"feat_{j}_val_{val}_class_{cls}"
+                # key = f"feat_{j}_val_{val}_class_{cls}"
+                key = (j, val, cls)
                 count = self.feature_counts.get(key)
                 total_class_feat = self.class_counts.get(f"class_{cls}")
                 vocab_size = self.vocab_sizes[j]

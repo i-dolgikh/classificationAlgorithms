@@ -18,7 +18,7 @@ class DecisionTree:
 
     def _build_tree(self, X, y, depth):
         num_samples = len(y)
-        num_features = len(X)
+        num_features = len(X[0])
 
         # Проверка критериев останова
         if num_samples >= self.min_samples_split and depth < self.max_depth:
@@ -28,6 +28,8 @@ class DecisionTree:
                 right_subtree = self._build_tree(best_split["X_right"], best_split["y_right"], depth + 1)
                 return TreeNode(best_split["feature_index"], best_split["threshold"], left_subtree, right_subtree)
 
+        if not y:  # На случай, если в ветку не попало ни одного объекта
+            return None
         # Вычисление значения листа (мажоритарное голосование)
         leaf_value = max(set(y), key=y.count)
         return TreeNode(value=leaf_value)
