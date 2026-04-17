@@ -17,7 +17,6 @@ class CustomHashTable:
         idx = self._hash(key)
         while self.keys[idx] is not None:
             if self.keys[idx] == key:
-                # print("collision")
                 self.values[idx] += 1
                 return
             idx = (idx + 1) % self.capacity

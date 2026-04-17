@@ -19,7 +19,7 @@ class NaiveBayesClassifier:
         for i in range(self.total_samples):
             cls = y[i]
             self.classes.add(cls)
-            self.class_counts.increment(f"class_{cls}")
+            self.class_counts.increment(cls)
 
             for j in range(num_features):
                 val = X[i][j]
@@ -41,14 +41,14 @@ class NaiveBayesClassifier:
 
         for cls in self.classes:
             # Использование логарифмов для предотвращения арифметического переполнения (underflow)
-            prob = math.log(self.class_counts.get(f"class_{cls}") / self.total_samples)
+            prob = math.log(self.class_counts.get(cls) / self.total_samples)
 
             for j in range(len(x)):
                 val = x[j]
                 # key = f"feat_{j}_val_{val}_class_{cls}"
                 key = (j, val, cls)
                 count = self.feature_counts.get(key)
-                total_class_feat = self.class_counts.get(f"class_{cls}")
+                total_class_feat = self.class_counts.get(cls)
                 vocab_size = self.vocab_sizes[j]
 
                 # Аддитивное сглаживание Лапласа

@@ -1,3 +1,4 @@
+import heapq
 
 class KDNode:
     def __init__(self, point, label, axis, left=None, right=None):
@@ -39,16 +40,19 @@ class CustomKDTree_KNN:
     def predict(self, X):
         return [self._predict_single(x) for x in X]
 
+    import heapq
+
+    # ... (предыдущий код без изменений)
+
     def _predict_single(self, x):
-        best_k = [] # Очередь ближайших соседей [(distance, label),...]
+        best_k = []  # Очередь ближайших соседей max-heap [(distance, label),...]
         self._search(self.root, x, best_k)
 
         # Мажоритарное голосование
         labels = [item[1] for item in best_k]
         return max(set(labels), key=labels.count)
         """
-        1. Таким голосованием варианты с одинаковым кол-вом меток будут выбираться случайно
-        1.а. set ставит элементы по возрастанию из-за чего в таких случаях будет выйгрывать меньшее значение класса
+        1. Таким голосованием варианты с одинаковым кол-вом меток будет выйгрывать меньшее значение класса
         """
 
     def _search(self, node, x, best_k):
@@ -57,13 +61,12 @@ class CustomKDTree_KNN:
 
         dist = sum((node.point[i] - x[i]) ** 2 for i in range(len(x)))
 
-        # Поддержание ровно k элементов
+        # Поддержание ровно k элементов с помощью новых max-методов
         if len(best_k) < self.k:
-            best_k.append((dist, node.label))
-            best_k.sort(key=lambda item: item[0])
-        elif dist < best_k[-1][0]:
-            best_k[-1] = (dist, node.label)
-            best_k.sort(key=lambda item: item[0])
+            heapq.heappush_max(best_k, (dist, node.label))
+        elif dist < best_k[0][0]:  # best_k[0][0] — это теперь напрямую максимальное расстояние
+            # heapreplace_max удаляет максимум и добавляет новый элемент
+            heapq.heapreplace_max(best_k, (dist, node.label))
 
         axis = node.axis
         diff = x[axis] - node.point[axis]
@@ -78,5 +81,5 @@ class CustomKDTree_KNN:
         self._search(close_branch, x, best_k)
 
         # Backtracking: проверяем, пересекает ли сфера гиперплоскость
-        if len(best_k) < self.k or (diff ** 2) < best_k[-1][0]:
+        if len(best_k) < self.k or (diff ** 2) < best_k[0][0]:
             self._search(far_branch, x, best_k)
