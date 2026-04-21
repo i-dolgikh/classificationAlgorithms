@@ -1,4 +1,4 @@
-from scr.models.custom_hash_table import CustomHashTable
+from src.models.custom_hash_table import CustomHashTable
 
 # Создаем экземпляр нашей таблицы с небольшой емкостью
 vocab = CustomHashTable(capacity=10)
