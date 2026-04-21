@@ -1,3 +1,2 @@
 .idea
-scr/tests
-data/ks-projects-201612.csv
+scr/tests/*
